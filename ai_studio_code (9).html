@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="ur">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Reoffy Pakistan - Grand Giveaway</title>
+
+    <meta name="theme-color" content="#10B981">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        :root { --accent-color: #10B981; --accent-color-dark: #059669; }
+        body { font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
+        .loader { border: 4px solid #f3f3f3; border-top: 4px solid var(--accent-color); border-radius: 50%; width: 32px; height: 32px; animation: spin 1s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        
+        #toast-notification {
+            position: fixed; top: -100px; left: 50%; transform: translateX(-50%);
+            display: flex; align-items: center; gap: 0.75rem;
+            padding: 0.75rem 1.5rem; border-radius: 9999px; color: white;
+            font-weight: 600; font-size: 0.9rem; z-index: 200;
+            transition: top 0.4s ease-in-out, background-color 0.3s; box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+        #toast-notification.show { top: 20px; }
+        #toast-notification.success { background-color: var(--accent-color); }
+        #toast-notification.error { background-color: #EF4444; }
+
+        .modal {
+            position: fixed; inset: 0; z-index: 100;
+            display: flex; align-items: center; justify-content: center;
+            background-color: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(5px);
+            opacity: 0; visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+        .modal.is-open { opacity: 1; visibility: visible; }
+        .modal-content {
+            transform: scale(0.95); opacity: 0;
+            transition: transform 0.3s ease, opacity 0.3s ease;
+        }
+        .modal.is-open .modal-content { transform: scale(1); opacity: 1; }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fadeInUp { animation: fadeInUp 0.6s ease-out forwards; }
+    </style>
+    
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        'accent': '#10B981', 'accent-dark': '#059669', 'dark-bg': '#121212', 
+                        'dark-surface': '#1e1e1e', 'dark-border': '#333333', 'light-bg': '#f3f4f6', 
+                        'light-surface': '#ffffff', 'light-border': '#e5e7eb',
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-light-bg dark:bg-dark-bg text-gray-800 dark:text-gray-100">
+
+    <div id="toast-notification"></div>
+    
+    <div class="w-full min-h-screen flex flex-col">
+        <header class="p-4 flex items-center justify-between sticky top-0 bg-light-surface/80 dark:bg-dark-bg/80 backdrop-blur-sm z-20 border-b border-light-border dark:border-dark-border">
+            <h1 class="text-xl font-bold text-accent">Reoffy Pakistan</h1>
+            <div id="auth-status" class="text-right">
+                <span class="text-sm text-gray-500">Searching for user...</span>
+            </div>
+        </header>
+
+        <main class="main-content pb-24 flex-grow">
+            <div class="relative h-64 md:h-80 bg-gradient-to-br from-emerald-500 to-green-700 text-white flex flex-col justify-center items-center p-6 text-center overflow-hidden">
+                <div class="absolute inset-0 bg-black/30"></div>
+                <div class="relative z-10">
+                    <h2 class="text-3xl md:text-5xl font-extrabold tracking-tight animate-fadeInUp" style="animation-delay: 0.1s;">Grand App Launch</h2>
+                    <p class="text-4xl md:text-6xl font-bold mt-2 text-yellow-300 animate-fadeInUp" style="animation-delay: 0.2s;">GIVEAWAY</p>
+                    <p class="mt-4 text-lg md:text-xl font-semibold bg-white/20 backdrop-blur-sm inline-block px-4 py-2 rounded-full animate-fadeInUp" style="animation-delay: 0.3s;">
+                        Join to Win from the Prize Pool!
+                    </p>
+                </div>
+            </div>
+
+            <div class="p-4 md:p-6 max-w-3xl mx-auto space-y-6">
+                <div class="bg-light-surface dark:bg-dark-surface p-5 rounded-xl shadow-lg text-center animate-fadeInUp" style="animation-delay: 0.4s;">
+                    <div class="flex justify-center items-center gap-2 text-sm font-medium text-gray-500 dark:text-gray-400">
+                        <i class="bi bi-trophy-fill"></i>
+                        <span>PRIZE POOL</span>
+                    </div>
+                    <p class="text-5xl font-extrabold text-accent mt-1">PKR 250,000</p>
+                    <button onclick="openModal('details-modal')" class="mt-3 text-sm font-semibold text-accent hover:underline">View Details</button>
+                </div>
+                
+                <div class="bg-gray-800 text-white p-5 rounded-xl shadow-lg animate-fadeInUp" style="animation-delay: 0.5s;">
+                    <h3 class="text-center text-lg font-semibold mb-4 tracking-wider">EVENT ENDS IN</h3>
+                    <div id="countdown-timer" class="grid grid-cols-4 gap-2 md:gap-4 text-center">
+                        <div><p id="days" class="text-4xl font-bold">--</p><span class="text-xs text-gray-400">DAYS</span></div>
+                        <div><p id="hours" class="text-4xl font-bold">--</p><span class="text-xs text-gray-400">HOURS</span></div>
+                        <div><p id="minutes" class="text-4xl font-bold">--</p><span class="text-xs text-gray-400">MINS</span></div>
+                        <div><p id="seconds" class="text-4xl font-bold">--</p><span class="text-xs text-gray-400">SECS</span></div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4 animate-fadeInUp" style="animation-delay: 0.6s;">
+                    <div class="bg-light-surface dark:bg-dark-surface p-4 rounded-xl shadow-lg text-center">
+                        <div class="flex justify-center items-center gap-2 text-sm font-medium text-gray-500 dark:text-gray-400">
+                            <i class="bi bi-people-fill"></i>
+                            <span>Total Participants</span>
+                        </div>
+                        <p id="total-participants" class="text-3xl font-bold mt-1">1572</p>
+                    </div>
+                    <div class="bg-light-surface dark:bg-dark-surface p-4 rounded-xl shadow-lg text-center">
+                        <div class="flex justify-center items-center gap-2 text-sm font-medium text-gray-500 dark:text-gray-400">
+                            <i class="bi bi-ticket-perforated-fill"></i>
+                            <span>Your Tickets</span>
+                        </div>
+                        <p id="user-tickets" class="text-3xl font-bold mt-1">0</p>
+                    </div>
+                </div>
+
+                <div id="action-container" class="mt-6 animate-fadeInUp" style="animation-delay: 0.7s;">
+                    <button id="join-now-btn" class="w-full bg-accent hover:bg-accent-dark text-white font-bold py-4 rounded-lg text-xl transition-all duration-300 shadow-lg shadow-accent/30 transform hover:scale-105 disabled:opacity-50">
+                        <span id="join-btn-text">Verifying User...</span>
+                        <div id="join-btn-loader" class="hidden loader h-6 w-6 mx-auto" style="border-width: 3px;"></div>
+                    </button>
+                </div>
+                
+                <div id="referral-section" class="hidden bg-light-surface dark:bg-dark-surface p-5 rounded-xl shadow-lg space-y-3">
+                    <h3 id="referral-title" class="text-center font-bold text-lg text-accent flex items-center justify-center gap-2">
+                        <i class="bi bi-share-fill"></i>
+                        <span>Get More Tickets!</span>
+                    </h3>
+                    <p class="text-center text-sm text-gray-600 dark:text-gray-400">Share your unique link. For every friend who joins, you get one extra ticket!</p>
+                    <div class="flex items-center space-x-2 mt-4">
+                        <input id="referral-link-input" type="text" readonly class="w-full bg-light-bg dark:bg-dark-bg border border-light-border dark:border-dark-border rounded-lg p-3 text-sm text-center font-mono">
+                        <button id="copy-btn" onclick="copyReferralLink()" class="p-3 bg-accent text-white rounded-lg flex-shrink-0 disabled:opacity-50">
+                            <i class="bi bi-clipboard-check-fill text-xl"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="bg-light-surface dark:bg-dark-surface p-5 rounded-xl shadow-lg animate-fadeInUp" style="animation-delay: 0.8s;">
+                    <h3 class="text-center font-bold text-lg mb-4 flex items-center justify-center gap-2">
+                        <i class="bi bi-bar-chart-line-fill"></i>
+                        <span>Top 10 Participants</span>
+                    </h3>
+                    <div id="leaderboard-list" class="space-y-3"></div>
+                </div>
+
+                <div class="bg-light-surface dark:bg-dark-surface p-5 rounded-xl shadow-lg text-center animate-fadeInUp" style="animation-delay: 0.9s;">
+                    <h3 class="text-xl font-bold text-gray-800 dark:text-gray-200 mb-4">Proudly Supported By</h3>
+                    <div class="flex flex-col items-center gap-4">
+                        <img src="https://i.ibb.co/jZHZjz6m/Whats-App-Image-2022-07-13-at-12-44-47-PM.jpg" alt="FIA Cyber Crime Wing" class="w-full max-w-sm h-auto rounded-lg object-contain">
+                        <p class="text-sm text-gray-600 dark:text-gray-400 max-w-md mt-2">
+                            To ensure complete transparency and fairness, this giveaway is proudly supported by the Federal Investigation Agency (FIA), Cyber Crime Wing. Your participation is secure and protected.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </main>
+        
+        <footer class="bg-light-surface dark:bg-dark-surface border-t border-light-border dark:border-dark-border mt-8">
+            <div class="max-w-3xl mx-auto py-6 px-4 text-center text-sm text-gray-500 dark:text-gray-400">
+                <p>&copy; 2025 Reoffy Pakistan. All Rights Reserved.</p>
+                <p class="mt-1">Join our community for more exciting events!</p>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Modals -->
+    <div id="details-modal" class="modal" onclick="closeModal('details-modal')">
+        <div class="modal-content bg-light-surface dark:bg-dark-surface w-11/12 max-w-md p-6 rounded-lg shadow-xl" onclick="event.stopPropagation()">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-xl font-bold text-accent">Giveaway Rules</h2>
+                <button onclick="closeModal('details-modal')" class="text-gray-500 dark:text-gray-400 text-2xl">&times;</button>
+            </div>
+            <div class="space-y-3 text-gray-700 dark:text-gray-300 text-sm">
+                 <p><strong class="font-semibold">Selection Process:</strong> Winners will be selected through a completely random lucky draw (قرعہ اندازی) after the event timer ends. Your luck determines the outcome!</p>
+                <p><strong class="font-semibold">Prize:</strong> Multiple winners will be chosen. Each winner will receive a prize of **PKR 50,000**.</p>
+                <p><strong class="font-semibold">Results:</strong> The list of winners will be announced on our app and social media pages once the countdown is complete.</p>
+                <p><strong class="font-semibold">Contacting Winners:</strong> We will contact the winners using the phone number you provide when joining. Please ensure your details are correct.</p>
+                <p><strong class="font-semibold">How to Get More Tickets:</strong> You get one ticket for joining. You can earn more tickets by sharing your referral link. For every person who joins using your link, you get one extra ticket, increasing your chances to win!</p>
+            </div>
+        </div>
+    </div>
+
+    <div id="join-modal" class="modal" onclick="closeModal('join-modal')">
+        <div class="modal-content bg-light-surface dark:bg-dark-surface w-11/12 max-w-md p-6 rounded-lg shadow-xl" onclick="event.stopPropagation()">
+             <h2 class="text-xl font-bold text-accent mb-2">Confirm Your Entry</h2>
+             <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">Please provide your details so we can contact you if you win.</p>
+             <div class="space-y-4">
+                <input id="username-input" type="text" placeholder="Your Full Name" class="w-full bg-light-bg dark:bg-dark-bg border border-light-border dark:border-dark-border rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-accent">
+                <input id="phone-input" type="tel" placeholder="Phone Number (e.g., 03001234567)" class="w-full bg-light-bg dark:bg-dark-bg border border-light-border dark:border-dark-border rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-accent">
+                <p id="join-error-msg" class="text-red-500 text-xs text-center h-4"></p>
+             </div>
+             <div class="mt-4 flex flex-col sm:flex-row gap-3">
+                 <button onclick="closeModal('join-modal')" class="w-full bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 font-bold py-3 rounded-lg transition-colors">Cancel</button>
+                 <button id="confirm-join-btn" class="w-full bg-accent hover:bg-accent-dark text-white font-bold py-3 rounded-lg transition-colors">Confirm & Join</button>
+             </div>
+        </div>
+    </div>
+    
+    <div id="success-modal" class="modal">
+        <div class="modal-content bg-light-surface dark:bg-dark-surface w-11/12 max-w-sm p-8 rounded-lg shadow-xl text-center" onclick="event.stopPropagation()">
+            <div class="w-20 h-20 mx-auto bg-green-100 dark:bg-green-900/50 rounded-full flex items-center justify-center">
+                 <i class="bi bi-check2-circle text-5xl text-accent"></i>
+            </div>
+             <h2 class="text-2xl font-bold text-gray-800 dark:text-gray-100 mt-5">Congratulations!</h2>
+             <p class="text-sm text-gray-600 dark:text-gray-400 mt-2 mb-6">You are now officially in the giveaway. Good luck!</p>
+             <button onclick="closeModal('success-modal')" class="w-full bg-accent hover:bg-accent-dark text-white font-bold py-3 rounded-lg transition-colors">Done</button>
+        </div>
+    </div>
+
+    <!-- Firebase SDKs -->
+    <script type="module">
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-app.js";
+      import { getDatabase, ref, onValue, get, runTransaction } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-database.js";
+
+      const firebaseConfig = {
+        apiKey: "AIzaSyCM0uOmXMVHAxuDjA86SQjTVgBs-yDjb8g",
+        authDomain: "frampakistan.firebaseapp.com",
+        databaseURL: "https://frampakistan-default-rtdb.firebaseio.com",
+        projectId: "frampakistan",
+        storageBucket: "frampakistan.appspot.com",
+        messagingSenderId: "101915821158",
+        appId: "1:101915821158:web:35b8f9d896707c2c6259a7",
+        measurementId: "G-D9GQCDGBT4"
+      };
+
+      const app = initializeApp(firebaseConfig);
+      const db = getDatabase(app);
+
+      window.firebase = { db, ref, onValue, get, runTransaction };
+    </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            if (!window.firebase) { console.error("Firebase is not initialized!"); return; }
+
+            const { db, ref, onValue, get, runTransaction } = window.firebase;
+            
+            // UI Elements
+            const authStatusEl = document.getElementById('auth-status');
+            const joinBtn = document.getElementById('join-now-btn');
+            const joinBtnText = document.getElementById('join-btn-text');
+            const userTicketsEl = document.getElementById('user-tickets');
+            const totalParticipantsEl = document.getElementById('total-participants');
+            const referralSection = document.getElementById('referral-section');
+            const referralLinkInput = document.getElementById('referral-link-input');
+            const copyBtn = document.getElementById('copy-btn');
+            const leaderboardList = document.getElementById('leaderboard-list');
+
+            // State
+            let currentUser = null;
+            const APP_URL = "https://reoffypakistan.netlify.app";
+            const BASE_PARTICIPANTS = 1572;
+            const now = new Date();
+            let eventEndDate = new Date(now.setDate(now.getDate() + 120)).getTime();
+
+            // --- UTILITIES ---
+            let toastTimeout;
+            const showToast = (message, type = 'success') => {
+                const toast = document.getElementById('toast-notification');
+                const iconClass = type === 'success' ? 'bi-check-circle-fill' : 'bi-exclamation-triangle-fill';
+                toast.innerHTML = `<i class="bi ${iconClass}"></i><span>${message}</span>`;
+                toast.className = 'show';
+                toast.classList.add(type);
+                clearTimeout(toastTimeout);
+                toastTimeout = setTimeout(() => { toast.classList.remove('show'); }, 3000);
+            };
+            
+            window.openModal = (modalId) => document.getElementById(modalId).classList.add('is-open');
+            window.closeModal = (modalId) => document.getElementById(modalId).classList.remove('is-open');
+
+            const showSuccessAnimation = () => {
+                openModal('success-modal');
+                confetti({ particleCount: 150, spread: 90, origin: { y: 0.6 } });
+            };
+
+            window.copyReferralLink = () => {
+                referralLinkInput.select();
+                document.execCommand('copy');
+                showToast('Referral link copied!', 'success');
+            };
+
+            // --- COUNTDOWN & LEADERBOARD ---
+            const startCountdown = () => {
+                const countdownTimer = document.getElementById('countdown-timer');
+                const daysEl = document.getElementById('days'), hoursEl = document.getElementById('hours'), minutesEl = document.getElementById('minutes'), secondsEl = document.getElementById('seconds');
+                
+                const interval = setInterval(() => {
+                    const distance = eventEndDate - new Date().getTime();
+                    if (distance < 0) {
+                        clearInterval(interval);
+                        countdownTimer.innerHTML = `<p class="col-span-4 text-center text-xl font-bold text-yellow-300">The event has ended!</p>`;
+                        return;
+                    }
+                    daysEl.textContent = String(Math.floor(distance / (1000*60*60*24))).padStart(2, '0');
+                    hoursEl.textContent = String(Math.floor((distance % (1000*60*60*24)) / (1000*60*60))).padStart(2, '0');
+                    minutesEl.textContent = String(Math.floor((distance % (1000*60*60)) / (1000*60))).padStart(2, '0');
+                    secondsEl.textContent = String(Math.floor((distance % (1000*60)) / 1000)).padStart(2, '0');
+                }, 1000);
+            };
+
+            const renderLeaderboard = () => {
+                const defaultLeaderboardData = [
+                    { name: 'Ali Khan', tickets: 58 }, { name: 'Fatima J.', tickets: 45 }, { name: 'Usman Raza', tickets: 41 }, 
+                    { name: 'Ayesha Bibi', tickets: 39 }, { name: 'Bilal Ahmed', tickets: 35 }, { name: 'Sana T.', tickets: 33 },
+                    { name: 'Imran Malik', tickets: 31 }, { name: 'Zainab Q.', tickets: 28 }, { name: 'Hassan Ali', tickets: 25 }, 
+                    { name: 'Maria K.', tickets: 22 },
+                ];
+                leaderboardList.innerHTML = defaultLeaderboardData.map((user, index) => `
+                    <div class="flex items-center justify-between text-sm p-2 rounded-md ${index < 3 ? 'bg-green-50 dark:bg-green-900/20' : ''}">
+                        <div class="flex items-center gap-3">
+                            <span class="font-bold w-6 text-gray-500 dark:text-gray-400">${index + 1}</span>
+                            <img src="https://i.pravatar.cc/40?u=${user.name.replace(/\s/g, '')}" alt="${user.name}" class="w-8 h-8 rounded-full">
+                            <span class="font-semibold text-gray-800 dark:text-gray-200">${user.name}</span>
+                        </div>
+                        <span class="font-bold text-accent flex items-center gap-1"><i class="bi bi-ticket-perforated"></i>${user.tickets}</span>
+                    </div>`).join('');
+            };
+            
+            // --- FIREBASE LISTENERS ---
+            const listenToEventData = () => {
+                onValue(ref(db, 'giveaway/stats/totalParticipants'), (snapshot) => {
+                    totalParticipantsEl.textContent = (snapshot.val() || 0) + BASE_PARTICIPANTS;
+                });
+            };
+
+            // --- CORE APP INTEGRATION LOGIC ---
+            const initializeUserFromUrl = () => {
+                const params = new URLSearchParams(window.location.search);
+                const uid = params.get('uid');
+                const displayName = params.get('displayName');
+
+                if (uid && displayName) {
+                    currentUser = { uid, displayName: decodeURIComponent(displayName) };
+                    authStatusEl.innerHTML = `<span class="text-sm font-semibold">Welcome, ${currentUser.displayName}</span>`;
+                    joinBtn.disabled = false;
+                    onValue(ref(db, `giveaway/participants/${currentUser.uid}`), updateUserUI);
+                } else {
+                    authStatusEl.innerHTML = `<span class="text-sm text-gray-500">Viewing as Guest</span>`;
+                    userTicketsEl.textContent = '0';
+                    joinBtnText.textContent = 'Open in App to Join';
+                    joinBtn.disabled = true;
+                    joinBtn.style.cssText = "background-color: #6b7280 !important; cursor: not-allowed;";
+                }
+            };
+            
+            const updateUserUI = (snapshot) => {
+                if (snapshot.exists()) {
+                    userTicketsEl.textContent = snapshot.val().tickets || 0;
+                    joinBtnText.textContent = 'Share Your Link';
+                    joinBtn.onclick = () => { referralLinkInput.select(); copyReferralLink(); };
+                    referralSection.classList.remove('hidden');
+                    referralLinkInput.value = `${APP_URL}/?ref=${currentUser.uid}`;
+                    copyBtn.disabled = false;
+                } else {
+                    userTicketsEl.textContent = '0';
+                    joinBtnText.textContent = 'Join Now';
+                    joinBtn.onclick = handleJoinClick;
+                    referralSection.classList.add('hidden');
+                }
+            };
+            
+            const handleJoinClick = () => {
+                if (!currentUser) return;
+                openModal('join-modal');
+                document.getElementById('username-input').value = currentUser.displayName;
+            };
+
+            const confirmJoin = async () => {
+                if (!currentUser) return;
+                const name = document.getElementById('username-input').value.trim();
+                const phone = document.getElementById('phone-input').value.trim();
+                const errorMsgEl = document.getElementById('join-error-msg');
+                const confirmBtn = document.getElementById('confirm-join-btn');
+                
+                if (!name || !/^(03)\d{9}$/.test(phone)) {
+                    errorMsgEl.textContent = 'Please enter a valid name and phone number.'; return;
+                }
+                
+                confirmBtn.disabled = true;
+                confirmBtn.innerHTML = `<div class="loader h-6 w-6 mx-auto"></div>`;
+                
+                try {
+                    const result = await runTransaction(ref(db, `giveaway/participants/${currentUser.uid}`), (data) => {
+                        if (data === null) {
+                            runTransaction(ref(db, 'giveaway/stats/totalParticipants'), (count) => (count || 0) + 1);
+                            return { tickets: 1, joinedAt: new Date().toISOString(), username: name, phone: phone };
+                        }
+                        return;
+                    });
+                    closeModal('join-modal');
+                    if (result.committed) {
+                        showSuccessAnimation();
+                        await handleReferral();
+                    } else {
+                        showToast('You have already joined the event!', 'success');
+                    }
+                } catch (error) {
+                    errorMsgEl.textContent = 'An error occurred. Please try again.';
+                } finally {
+                    confirmBtn.disabled = false;
+                    confirmBtn.textContent = 'Confirm & Join';
+                }
+            };
+            
+            const handleReferral = async () => {
+                const refId = new URLSearchParams(window.location.search).get('ref');
+                if (!refId || (currentUser && refId === currentUser.uid)) return;
+                try {
+                    await runTransaction(ref(db, `giveaway/participants/${refId}`), (data) => {
+                        if (data) { data.tickets = (data.tickets || 0) + 1; }
+                        return data;
+                    });
+                } catch (e) { console.error("Referral failed:", e); }
+            };
+
+            // --- INITIALIZATION ---
+            initializeUserFromUrl();
+            document.getElementById('confirm-join-btn').onclick = confirmJoin;
+            startCountdown();
+            renderLeaderboard();
+            listenToEventData();
+        });
+    </script>
+</body>
+</html>
